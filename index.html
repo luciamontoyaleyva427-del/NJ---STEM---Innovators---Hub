@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NJSI Initiative — Member Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F6F2;
+  --surface: #FFFFFF;
+  --surface2: #F0EFE9;
+  --border: #E2E0D8;
+  --border2: #D0CECC;
+  --text: #1A1916;
+  --text2: #6B6860;
+  --text3: #A8A59F;
+  --accent: #2B5BA8;
+  --accent-bg: #EBF0FB;
+  --accent-txt: #1A3A72;
+  --green: #1A7A4A;
+  --green-bg: #E8F5EE;
+  --green-txt: #0F4F2E;
+  --red: #C23B22;
+  --red-bg: #FBEAE7;
+  --red-txt: #7A2214;
+  --amber: #A0680A;
+  --amber-bg: #FDF3E1;
+  --amber-txt: #6B4407;
+  --purple: #5B3FA6;
+  --purple-bg: #F0ECFB;
+  --purple-txt: #3A2570;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
+ 
+/* Layout */
+.shell { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+ 
+/* Sidebar */
+.logo-wrap { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+.logo-badge { display: inline-flex; align-items: center; gap: 8px; }
+.logo-icon { width: 30px; height: 30px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-icon svg { width: 16px; height: 16px; fill: #fff; }
+.logo-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+.logo-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.nav-section { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 20px 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 20px; cursor: pointer; font-size: 13.5px; color: var(--text2); transition: all 0.1s; border-left: 2px solid transparent; }
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active { background: var(--accent-bg); color: var(--accent-txt); border-left-color: var(--accent); font-weight: 500; }
+.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.sidebar-footer { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.you-av { width: 32px; height: 32px; border-radius: 50%; background: var(--green-bg); color: var(--green-txt); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.you-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.you-role { font-size: 11px; color: var(--text3); }
+ 
+/* Topbar */
+.topbar { padding: 14px 28px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
+.page-title { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.badge-urg { background: var(--red-bg); color: var(--red-txt); font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+.member-count { font-size: 12px; color: var(--text3); }
+ 
+/* Content */
+.content { padding: 24px 28px; flex: 1; }
+.panel { display: none; flex-direction: column; gap: 18px; }
+.panel.active { display: flex; }
+ 
+/* Stats row */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.stat-label { font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.stat-val { font-size: 28px; font-weight: 300; color: var(--text); font-family: 'DM Mono', monospace; letter-spacing: -1px; }
+.stat-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+ 
+/* Cards */
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+.card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.card-title { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+.btn-sm { font-size: 12px; padding: 4px 11px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: transparent; color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.1s; }
+.btn-sm:hover { background: var(--bg); color: var(--text); }
+.full-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+ 
+/* Tasks */
+.task-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.task-item:last-child { border-bottom: none; padding-bottom: 0; }
+.chk { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--border2); flex-shrink: 0; cursor: pointer; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.chk:hover { border-color: var(--green); }
+.chk.done { background: var(--green); border-color: var(--green); }
+.task-name { font-size: 13.5px; color: var(--text); }
+.task-name.done { text-decoration: line-through; color: var(--text3); }
+.task-meta { font-size: 11px; color: var(--text2); margin-top: 3px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.chip { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+.chip-red { background: var(--red-bg); color: var(--red-txt); }
+.chip-amber { background: var(--amber-bg); color: var(--amber-txt); }
+.chip-gray { background: var(--surface2); color: var(--text2); }
+.chip-blue { background: var(--accent-bg); color: var(--accent-txt); }
+.chip-green { background: var(--green-bg); color: var(--green-txt); }
+.chip-purple { background: var(--purple-bg); color: var(--purple-txt); }
+ 
+/* Announcements */
+.ann-item { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.ann-item:last-child { border-bottom: none; padding-bottom: 0; }
+.av { width: 32px; height: 32px; border-radius: 50%; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ann-title { font-size: 13px; font-weight: 500; color: var(--text); margin: 2px 0; }
+.ann-text { font-size: 12.5px; color: var(--text2); line-height: 1.55; }
+.ann-meta { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
+.ann-auth { font-size: 12px; font-weight: 500; color: var(--text); }
+.ann-time { font-size: 11px; color: var(--text3); }
+ 
+/* Calendar */
+.cal-days-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 3px; }
+.cal-day-label { font-size: 10px; font-weight: 600; text-align: center; color: var(--text3); padding: 3px 0; letter-spacing: 0.05em; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-cell { font-size: 12px; text-align: center; padding: 6px 2px; border-radius: var(--radius-sm); color: var(--text2); cursor: pointer; transition: background 0.1s; }
+.cal-cell:hover { background: var(--bg); }
+.cal-cell.has-ev { background: var(--accent-bg); color: var(--accent-txt); font-weight: 600; }
+.cal-cell.today { background: var(--green); color: #fff; font-weight: 600; }
+.cal-cell.past { color: var(--text3); }
+.evt-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.evt-item { display: flex; align-items: center; gap: 8px; padding: 8px 11px; border-radius: var(--radius-sm); background: var(--bg); border: 1px solid var(--border); }
+.evt-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.evt-name { font-size: 13px; color: var(--text); flex: 1; }
+.evt-date { font-size: 11px; color: var(--text3); }
+ 
+/* Members */
+.member-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.member-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; transition: box-shadow 0.15s; }
+.member-card:hover { box-shadow: var(--shadow); background: var(--surface); }
+.member-av { width: 36px; height: 36px; border-radius: 50%; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+.member-name { font-size: 12.5px; font-weight: 500; color: var(--text); }
+.member-role { font-size: 11px; color: var(--text2); }
+.member-loc { font-size: 10px; color: var(--text3); }
+ 
+/* Deadline rows */
+.dl-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.dl-row:last-child { border-bottom: none; }
+.dl-name { font-size: 13px; color: var(--text); }
+.dl-who { font-size: 11px; color: var(--text3); margin-top: 1px; }
+ 
+/* Progress */
+.prog-row { margin-bottom: 10px; }
+.prog-bar { height: 5px; border-radius: 999px; background: var(--bg); overflow: hidden; margin-top: 5px; border: 1px solid var(--border); }
+.prog-fill { height: 100%; border-radius: 999px; background: var(--green); transition: width 0.4s ease; }
+ 
+/* Forms */
+.form-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 9px; }
+.inp { font-size: 13px; padding: 7px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); width: 100%; font-family: 'DM Sans', sans-serif; transition: border-color 0.1s; }
+.inp:focus { outline: none; border-color: var(--accent); }
+.sel { font-size: 13px; padding: 7px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; }
+.btn-prim { font-size: 13px; font-weight: 500; padding: 7px 14px; background: var(--accent); border: none; border-radius: var(--radius-sm); color: #fff; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.1s; }
+.btn-prim:hover { opacity: 0.88; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.flex-row { display: flex; gap: 8px; align-items: center; }
+ 
+/* Alerts */
+.alert-banner { background: var(--amber-bg); border: 1px solid #E0B96A; border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12.5px; color: var(--amber-txt); display: flex; align-items: center; gap: 8px; }
+ 
+/* Communication guide */
+.guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.guide-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; background: var(--surface); }
+.guide-head { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.guide-icon { width: 22px; height: 22px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.guide-text { font-size: 12px; color: var(--text2); line-height: 1.55; }
+ 
+@media (max-width: 768px) {
+  .shell { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; flex-wrap: wrap; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .row2, .row3 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+ 
+<div class="shell">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-badge">
+        <div class="logo-icon">
+          <svg viewBox="0 0 20 20"><path d="M10 2L2 7v6l8 5 8-5V7L10 2z"/></svg>
+        </div>
+        <div>
+          <div class="logo-name">NJSI Initiative</div>
+          <div class="logo-sub">Member Portal</div>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="nav-section">Workspace</div>
+    <div class="nav-item active" onclick="nav('dashboard',this)">
+      <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="nav('tasks',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4,10 8,14 16,6"/><rect x="2" y="2" width="16" height="16" rx="2"/></svg>
+      Tasks
+    </div>
+    <div class="nav-item" onclick="nav('comms',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H6l-4 3V5z"/></svg>
+      Announcements
+    </div>
+    <div class="nav-item" onclick="nav('calendar',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="16" height="15" rx="2"/><line x1="2" y1="8" x2="18" y2="8"/><line x1="7" y1="2" x2="7" y2="5"/><line x1="13" y1="2" x2="13" y2="5"/></svg>
+      Calendar
+    </div>
+ 
+    <div class="nav-section">People</div>
+    <div class="nav-item" onclick="nav('members',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="7" r="3"/><path d="M2 17c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="15" cy="7" r="2.5"/><path d="M17 15c0-2.2-1.1-4-3-5"/></svg>
+      Members
+    </div>
+    <div class="nav-item" onclick="nav('guide',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="8"/><line x1="10" y1="6" x2="10" y2="10"/><circle cx="10" cy="14" r="0.7" fill="currentColor"/></svg>
+      Comm Guide
+    </div>
+ 
+    <div class="sidebar-footer">
+      <div class="you-av">YO</div>
+      <div>
+        <div class="you-name">You</div>
+        <div class="you-role">Member · NJ</div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title" id="ptitle">Dashboard</div>
+      <div class="topbar-right">
+        <span class="member-count">25 active members · NJ + International</span>
+        <span class="badge-urg" id="urg-badge">3 urgent</span>
+      </div>
+    </div>
+ 
+    <div class="content">
+ 
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="alert-banner">
+          ⚡ <strong>3 tasks</strong> are due within the next 48 hours. Check the Tasks panel to stay on track.
+        </div>
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-label">Open Tasks</div>
+            <div class="stat-val" id="oc">7</div>
+            <div class="stat-sub">across all members</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Due This Week</div>
+            <div class="stat-val">3</div>
+            <div class="stat-sub">2 overdue</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Members</div>
+            <div class="stat-val">25</div>
+            <div class="stat-sub">NJ + International</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Completed</div>
+            <div class="stat-val">14</div>
+            <div class="stat-sub">this month</div>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Priority tasks</div>
+              <button class="btn-sm" onclick="nav('tasks',document.querySelectorAll('.nav-item')[1])">View all →</button>
+            </div>
+            <div id="dtasks"></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Latest announcements</div>
+              <button class="btn-sm" onclick="nav('comms',document.querySelectorAll('.nav-item')[2])">View all →</button>
+            </div>
+            <div id="dcomms"></div>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">Upcoming deadlines</div></div>
+            <div id="ddl"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Progress by area</div></div>
+            <div id="dprog"></div>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- TASKS -->
+      <div class="panel" id="panel-tasks">
+        <div class="full-card">
+          <div class="card-head">
+            <div class="card-title">All tasks</div>
+            <button class="btn-sm" onclick="toggleF('tform')">+ Add task</button>
+          </div>
+          <div id="tform" style="display:none" class="form-box">
+            <div class="grid3">
+              <input id="nt-name" class="inp" placeholder="Task name">
+              <input id="nt-who" class="inp" placeholder="Assignee">
+              <input id="nt-due" class="inp" type="date">
+            </div>
+            <div class="flex-row">
+              <select id="nt-pri" class="sel"><option>High</option><option>Medium</option><option>Low</option></select>
+              <select id="nt-cat" class="sel"><option>Outreach</option><option>Events</option><option>Admin</option><option>Research</option><option>Fundraising</option></select>
+              <button class="btn-prim" onclick="addTask()">Add task</button>
+              <button class="btn-sm" onclick="toggleF('tform')">Cancel</button>
+            </div>
+          </div>
+          <div id="atasks"></div>
+        </div>
+      </div>
+ 
+      <!-- ANNOUNCEMENTS -->
+      <div class="panel" id="panel-comms">
+        <div class="full-card">
+          <div class="card-head">
+            <div class="card-title">Announcements</div>
+            <button class="btn-sm" onclick="toggleF('aform')">+ Post update</button>
+          </div>
+          <div id="aform" style="display:none" class="form-box">
+            <input id="af-title" class="inp" placeholder="Announcement title">
+            <textarea id="af-body" class="inp" placeholder="Write your message to the team..." style="height:80px;resize:vertical"></textarea>
+            <div class="flex-row">
+              <select id="af-type" class="sel"><option>General</option><option>Urgent</option><option>Event</option><option>Reminder</option></select>
+              <button class="btn-prim" onclick="postAnn()">Post announcement</button>
+              <button class="btn-sm" onclick="toggleF('aform')">Cancel</button>
+            </div>
+          </div>
+          <div id="acomms"></div>
+        </div>
+      </div>
+ 
+      <!-- CALENDAR -->
+      <div class="panel" id="panel-calendar">
+        <div class="row2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">April 2026</div></div>
+            <div class="cal-days-header">
+              <div class="cal-day-label">Su</div><div class="cal-day-label">Mo</div><div class="cal-day-label">Tu</div>
+              <div class="cal-day-label">We</div><div class="cal-day-label">Th</div><div class="cal-day-label">Fr</div><div class="cal-day-label">Sa</div>
+            </div>
+            <div class="cal-grid" id="calcells"></div>
+            <div class="evt-list" id="calevts"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Schedule an event</div></div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <input id="en" class="inp" placeholder="Event name">
+              <input id="ed" class="inp" type="date">
+              <select id="et" class="sel" style="width:100%"><option>Meeting</option><option>Deadline</option><option>Event</option><option>Check-in</option></select>
+              <input id="el" class="inp" placeholder="Zoom / Meet link (optional)">
+              <input id="eg" class="inp" placeholder="Notes (optional)">
+              <button class="btn-prim" onclick="addEvt()">Add to calendar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- MEMBERS -->
+      <div class="panel" id="panel-members">
+        <div class="full-card">
+          <div class="card-head">
+            <div class="card-title">Member directory</div>
+            <span style="font-size:12px;color:var(--text3)">NJ + International · 25 members</span>
+          </div>
+          <div class="member-grid" id="mems"></div>
+        </div>
+      </div>
+ 
+      <!-- COMMUNICATION GUIDE -->
+      <div class="panel" id="panel-guide">
+        <div class="full-card">
+          <div class="card-head"><div class="card-title">Communication guide for NJSI</div></div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">With members across New Jersey and internationally, clear and consistent communication is critical. Use this guide to stay aligned.</p>
+          <div class="guide-grid">
+            <div class="guide-card">
+              <div class="guide-head"><div class="guide-icon" style="background:var(--accent-bg)">📢</div>Announcements</div>
+              <div class="guide-text">Use the Announcements panel for anything the entire team needs to see — events, deadlines, updates. Tag posts as <strong>Urgent</strong>, <strong>Event</strong>, or <strong>Reminder</strong> so members know the priority at a glance.</div>
+            </div>
+            <div class="guide-card">
+              <div class="guide-head"><div class="guide-icon" style="background:var(--green-bg)">✓</div>Tasks</div>
+              <div class="guide-text">Every piece of work should be a task with a clear owner, due date, and priority. No more "did anyone do this?" — if it's not a task, it doesn't exist. Check off tasks when done to keep the dashboard accurate.</div>
+            </div>
+            <div class="guide-card">
+              <div class="guide-head"><div class="guide-icon" style="background:var(--amber-bg)">📅</div>Calendar</div>
+              <div class="guide-text">All meetings and deadlines go on the shared calendar. Include Zoom links for every virtual meeting. International members: always post times in EST and note it — members can convert to their own timezone.</div>
+            </div>
+            <div class="guide-card">
+              <div class="guide-head"><div class="guide-icon" style="background:var(--red-bg)">⚡</div>Urgent matters</div>
+              <div class="guide-text">Tag announcements as <strong>Urgent</strong> when action is needed within 24 hours. Do not overuse this — if everything is urgent, nothing is. Reserve for time-sensitive decisions or emergencies only.</div>
+            </div>
+            <div class="guide-card">
+              <div class="guide-head"><div class="guide-icon" style="background:var(--purple-bg)">🌍</div>International members</div>
+              <div class="guide-text">Default meeting timezone is <strong>EST</strong>. Aim to schedule calls between 2–6 PM EST when possible (overlaps with European evening and African afternoon hours). Always send a meeting recap to those who can't attend live.</div>
+            </div>
+            <div class="guide-card">
+              <div class="guide-head"><div class="guide-icon" style="background:var(--surface2)">📋</div>Weekly rhythm</div>
+              <div class="guide-text"><strong>Monday:</strong> review your tasks for the week. <strong>Wednesday:</strong> post a mid-week update if you're blocked. <strong>Friday:</strong> mark completed tasks done and flag anything at risk. Consistency keeps the whole team on track.</div>
+            </div>
+          </div>
+          <div style="margin-top:18px;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm)">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px">Golden rules</div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="font-size:12.5px;color:var(--text2)">1. If it's not written down (task or announcement), assume it didn't happen.</div>
+              <div style="font-size:12.5px;color:var(--text2)">2. Assign every task to a specific person — "we'll handle it" means no one handles it.</div>
+              <div style="font-size:12.5px;color:var(--text2)">3. If you're running late on a task, flag it early — not the day it's due.</div>
+              <div style="font-size:12.5px;color:var(--text2)">4. Respect timezone differences. Not everyone is in NJ — plan with the whole team in mind.</div>
+              <div style="font-size:12.5px;color:var(--text2)">5. Keep announcements concise and action-oriented. State what people need to do and by when.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+    </div>
+  </div>
+</div>
+ 
+<script>
+const AVC=[
+  ['#EBF0FB','#1A3A72'],['#E8F5EE','#0F4F2E'],['#FDF3E1','#6B4407'],
+  ['#FBEAE7','#7A2214'],['#F0ECFB','#3A2570'],['#E1F5EE','#085041'],
+  ['#FAEEDA','#633806'],['#EBF0FB','#2B5BA8']
+];
+let tasks=[
+  {id:1,name:'Finalize Q2 outreach report',who:'Amara O.',due:'2026-04-25',pri:'High',cat:'Outreach',done:false},
+  {id:2,name:'Send newsletter to all members',who:'Jonas W.',due:'2026-04-26',pri:'High',cat:'Admin',done:false},
+  {id:3,name:'Coordinate international call logistics',who:'Priya M.',due:'2026-04-28',pri:'High',cat:'Events',done:false},
+  {id:4,name:'Update member directory',who:'Carlos R.',due:'2026-04-30',pri:'Medium',cat:'Admin',done:false},
+  {id:5,name:'Draft fundraising pitch deck',who:'Sasha L.',due:'2026-05-03',pri:'Medium',cat:'Fundraising',done:false},
+  {id:6,name:'Research NJ grant opportunities',who:'Yemi A.',due:'2026-05-05',pri:'Low',cat:'Research',done:true},
+  {id:7,name:'Book venue for May meeting',who:'Dana C.',due:'2026-05-10',pri:'Medium',cat:'Events',done:false},
+];
+let anns=[
+  {id:1,title:'Monthly check-in — May 2',auth:'Amara O.',time:'Today, 9:15 AM',txt:'Reminder: our monthly all-hands is May 2 at 7 PM EST via Zoom. International members, please account for your timezone. Zoom link will be sent 24 hours before the call.',type:'Event'},
+  {id:2,title:'Action needed: update your availability',auth:'Jonas W.',time:'Yesterday, 3:40 PM',txt:'Please fill out the Q3 availability form by April 30. This helps us schedule events and check-ins that work across timezones for everyone on the team.',type:'Urgent'},
+  {id:3,title:'Welcome our new members!',auth:'Priya M.',time:'Apr 20',txt:'A warm welcome to the 3 new members who joined us from Lagos, London, and Newark this month. Please introduce yourselves in the group chat — excited to have you on board!',type:'General'},
+];
+let evts=[
+  {name:'Monthly all-hands (Zoom)',day:2,color:'#185FA5'},
+  {name:'Q2 report deadline',day:8,color:'#C23B22'},
+  {name:'Fundraising strategy call',day:14,color:'#185FA5'},
+  {name:'Newark community event',day:21,color:'#1A7A4A'},
+  {name:'International member check-in',day:28,color:'#A0680A'},
+];
+const members=[
+  {n:'Amara O.',r:'Chair',l:'Newark, NJ'},{n:'Jonas W.',r:'Secretary',l:'Jersey City, NJ'},
+  {n:'Priya M.',r:'Events Lead',l:'London, UK'},{n:'Carlos R.',r:'Member',l:'Edison, NJ'},
+  {n:'Sasha L.',r:'Fundraising',l:'Trenton, NJ'},{n:'Yemi A.',r:'Research Lead',l:'Lagos, NG'},
+  {n:'Dana C.',r:'Member',l:'Hoboken, NJ'},{n:'Fatima K.',r:'Outreach',l:'Toronto, CA'},
+  {n:'Marcus T.',r:'Member',l:'Paterson, NJ'},{n:'Lena B.',r:'Comms',l:'Berlin, DE'},
+  {n:'Omar S.',r:'Member',l:'Newark, NJ'},{n:'Chloe N.',r:'Member',l:'Cape Town, SA'},
+  {n:'Ravi P.',r:'Tech Lead',l:'Piscataway, NJ'},{n:'Ingrid H.',r:'Member',l:'Stockholm, SE'},
+  {n:'Kwame A.',r:'Member',l:'Accra, GH'},
+];
+const ini=n=>n.split(' ').map(p=>p[0]).join('').slice(0,2);
+const avc=i=>AVC[i%AVC.length];
+const pchip=p=>p==='High'?'<span class="chip chip-red">High</span>':p==='Medium'?'<span class="chip chip-amber">Med</span>':'<span class="chip chip-gray">Low</span>';
+const tchip=t=>({Urgent:'<span class="chip chip-red">Urgent</span>',Event:'<span class="chip chip-blue">Event</span>',Reminder:'<span class="chip chip-amber">Reminder</span>',General:'<span class="chip chip-gray">General</span>'})[t]||'<span class="chip chip-gray">General</span>';
+const catChip=c=>({Outreach:'chip-blue',Events:'chip-purple',Admin:'chip-gray',Research:'chip-green',Fundraising:'chip-amber'})[c]||'chip-gray';
+ 
+function rDTasks(){
+  document.getElementById('dtasks').innerHTML=tasks.filter(t=>!t.done).slice(0,4).map(t=>`
+    <div class="task-item"><div class="chk" onclick="tog(${t.id})"></div>
+    <div style="flex:1"><div class="task-name">${t.name}</div>
+    <div class="task-meta">${pchip(t.pri)}<span>Due ${t.due.slice(5)}</span><span style="color:var(--text3)">${t.who}</span></div></div></div>`).join('');
+}
+function rATasks(){
+  document.getElementById('atasks').innerHTML=tasks.map(t=>`
+    <div class="task-item"><div class="chk ${t.done?'done':''}" onclick="tog(${t.id})">${t.done?'<svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5l2.5 2.5L8 1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+    <div style="flex:1"><div class="task-name ${t.done?'done':''}">${t.name}</div>
+    <div class="task-meta">${pchip(t.pri)}<span class="chip ${catChip(t.cat)}">${t.cat}</span><span>Due ${t.due.slice(5)}</span><span style="color:var(--text3)">→ ${t.who}</span></div></div></div>`).join('');
+}
+function rDComms(){
+  document.getElementById('dcomms').innerHTML=anns.slice(0,3).map(a=>`
+    <div class="ann-item"><div>
+    <div class="ann-meta">${tchip(a.type)}<span class="ann-auth">${a.auth}</span><span class="ann-time">${a.time}</span></div>
+    <div class="ann-title">${a.title}</div>
+    <div class="ann-text">${a.txt.slice(0,90)}...</div></div></div>`).join('');
+}
+function rAComms(){
+  document.getElementById('acomms').innerHTML=anns.map((a,i)=>`
+    <div class="ann-item"><div class="av" style="background:${avc(i)[0]};color:${avc(i)[1]}">${ini(a.auth)}</div>
+    <div style="flex:1"><div class="ann-meta">${tchip(a.type)}<span class="ann-auth">${a.auth}</span><span class="ann-time">${a.time}</span></div>
+    <div class="ann-title">${a.title}</div>
+    <div class="ann-text">${a.txt}</div></div></div>`).join('');
+}
+function rDDL(){
+  document.getElementById('ddl').innerHTML=tasks.filter(t=>!t.done).sort((a,b)=>a.due.localeCompare(b.due)).slice(0,5).map(t=>`
+    <div class="dl-row"><div><div class="dl-name">${t.name}</div><div class="dl-who">${t.who}</div></div>
+    <div style="text-align:right"><div style="font-size:12px;color:var(--text);font-family:'DM Mono',monospace">${t.due.slice(5)}</div>${pchip(t.pri)}</div></div>`).join('');
+}
+function rDProg(){
+  document.getElementById('dprog').innerHTML=['Outreach','Events','Admin','Fundraising','Research'].map(cat=>{
+    const all=tasks.filter(t=>t.cat===cat);
+    const done=all.filter(t=>t.done).length;
+    const pct=all.length?Math.round(done/all.length*100):0;
+    return `<div class="prog-row"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:var(--text2)">${cat}</span><span style="color:var(--text3);font-family:'DM Mono',monospace">${done}/${all.length}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div></div>`;
+  }).join('');
+}
+function rCal(){
+  let h='';
+  for(let i=0;i<2;i++)h+=`<div class="cal-cell past"></div>`;
+  for(let d=1;d<=30;d++){
+    const he=evts.find(e=>e.day===d);
+    h+=`<div class="cal-cell ${d===24?'today':he?'has-ev':''}">${d}</div>`;
+  }
+  document.getElementById('calcells').innerHTML=h;
+  document.getElementById('calevts').innerHTML=evts.map(e=>`
+    <div class="evt-item"><div class="evt-dot" style="background:${e.color}"></div><span class="evt-name">${e.name}</span><span class="evt-date">Apr ${e.day}</span></div>`).join('');
+}
+function rMems(){
+  document.getElementById('mems').innerHTML=members.map((m,i)=>`
+    <div class="member-card"><div class="member-av" style="background:${avc(i)[0]};color:${avc(i)[1]}">${ini(m.n)}</div>
+    <div class="member-name">${m.n}</div><div class="member-role">${m.r}</div><div class="member-loc">${m.l}</div></div>`).join('');
+}
+function tog(id){
+  const t=tasks.find(x=>x.id===id);if(t)t.done=!t.done;
+  const oc=document.getElementById('oc');
+  if(oc)oc.textContent=tasks.filter(x=>!x.done).length;
+  const urg=tasks.filter(x=>!x.done&&x.pri==='High').length;
+  const ub=document.getElementById('urg-badge');
+  if(ub)ub.textContent=`${urg} urgent`;
+  rDTasks();rATasks();rDDL();rDProg();
+}
+function toggleF(id){const f=document.getElementById(id);f.style.display=f.style.display==='none'?'flex':'none';}
+function addTask(){
+  const name=document.getElementById('nt-name').value.trim();
+  const who=document.getElementById('nt-who').value.trim();
+  const due=document.getElementById('nt-due').value;
+  const pri=document.getElementById('nt-pri').value;
+  const cat=document.getElementById('nt-cat').value;
+  if(!name)return;
+  tasks.unshift({id:Date.now(),name,who:who||'Unassigned',due:due||'2026-05-31',pri,cat,done:false});
+  document.getElementById('tform').style.display='none';
+  ['nt-name','nt-who','nt-due'].forEach(id=>document.getElementById(id).value='');
+  rATasks();rDTasks();rDDL();rDProg();
+}
+function postAnn(){
+  const title=document.getElementById('af-title').value.trim();
+  const txt=document.getElementById('af-body').value.trim();
+  const type=document.getElementById('af-type').value;
+  if(!title)return;
+  anns.unshift({id:Date.now(),title,auth:'You',time:'Just now',txt:txt||'No details provided.',type});
+  document.getElementById('aform').style.display='none';
+  ['af-title','af-body'].forEach(id=>document.getElementById(id).value='');
+  rAComms();rDComms();
+}
+function addEvt(){
+  const name=document.getElementById('en').value.trim();
+  const date=document.getElementById('ed').value;
+  if(!name||!date)return;
+  const day=parseInt(date.slice(8));
+  const cols={Meeting:'#185FA5',Deadline:'#C23B22',Event:'#1A7A4A','Check-in':'#A0680A'};
+  evts.push({name,day,color:cols[document.getElementById('et').value]||'#6B6860'});
+  document.getElementById('en').value='';document.getElementById('ed').value='';
+  rCal();
+}
+function nav(p,el){
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('panel-'+p).classList.add('active');
+  el.classList.add('active');
+  const titles={dashboard:'Dashboard',tasks:'Tasks',comms:'Announcements',calendar:'Calendar',members:'Members',guide:'Communication Guide'};
+  document.getElementById('ptitle').textContent=titles[p];
+}
+rDTasks();rDComms();rDDL();rDProg();rATasks();rAComms();rCal();rMems();
+</script>
+</body>
+</html>
